@@ -37,53 +37,38 @@ export default function MatchingPage() {
 
     // Call API to find match
     const findMatch = async () => {
-      // Simulate API delay (in real app, this would poll or use WebSocket)
-      await new Promise((resolve) => setTimeout(resolve, 2000 + Math.random() * 2000));
+      try {
+        const result = await api.findMatch(user.anonymousId);
 
-      const result = await api.findMatch(user.anonymousId);
+        if (result.data?.status === "match_found" && result.data.match_id && result.data.partner) {
+          const match = {
+            matchId: result.data.match_id,
+            name: result.data.partner.display_name,
+            compatibility: result.data.partner.compatibility,
+            interests: result.data.partner.interests,
+            style: "Playful", // Would come from API
+          };
 
-      if (result.data?.status === "match_found" && result.data.match_id && result.data.partner) {
-        const match = {
-          matchId: result.data.match_id,
-          name: result.data.partner.display_name,
-          compatibility: result.data.partner.compatibility,
-          interests: result.data.partner.interests,
-          style: "Playful", // Would come from API
-        };
+          setMatchData(match);
+          setStatus("found");
 
-        setMatchData(match);
-        setStatus("found");
-
-        // Save to local store
-        matchesStore.addMatch({
-          matchId: match.matchId,
-          partnerName: match.name,
-          partnerInterests: match.interests,
-          compatibility: match.compatibility,
-          unreadCount: 0,
-          createdAt: new Date().toISOString(),
-        });
-      } else {
-        // Fallback demo match for testing
-        const demoMatch = {
-          matchId: `match_${Date.now()}`,
-          name: "NightOwlGamer",
-          compatibility: 92,
-          interests: ["Gaming", "Anime", "Music"],
-          style: "Playful",
-        };
-
-        setMatchData(demoMatch);
-        setStatus("found");
-
-        matchesStore.addMatch({
-          matchId: demoMatch.matchId,
-          partnerName: demoMatch.name,
-          partnerInterests: demoMatch.interests,
-          compatibility: demoMatch.compatibility,
-          unreadCount: 0,
-          createdAt: new Date().toISOString(),
-        });
+          // Save to local store
+          matchesStore.addMatch({
+            matchId: match.matchId,
+            partnerName: match.name,
+            partnerInterests: match.interests,
+            compatibility: match.compatibility,
+            unreadCount: 0,
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          // Still searching/queued - retry after delay
+          setTimeout(findMatch, 3000);
+        }
+      } catch (error) {
+        console.error("Error finding match:", error);
+        // Retry on error too
+        setTimeout(findMatch, 3000);
       }
     };
 
