@@ -25,7 +25,6 @@ export function useUser() {
       energyLevel: string;
     }) => {
       const result = await api.createProfile({
-        display_name: profile.displayName,
         interests: profile.interests,
         conversation_style: profile.conversationStyle,
         energy_level: profile.energyLevel,
