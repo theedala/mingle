@@ -2,7 +2,9 @@
  * API Client for Mingle Backend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// In production, use empty string for relative URLs (nginx proxies /api to backend)
+// In development, use localhost:8000
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface ApiResponse<T> {
   data?: T;
