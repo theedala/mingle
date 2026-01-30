@@ -37,14 +37,23 @@ async def init_postgres() -> None:
         pool_pre_ping=True,
     )
     
+    
     _session_factory = async_sessionmaker(
         bind=_engine,
         class_=AsyncSession,
         expire_on_commit=False,
         autoflush=False,
     )
+
+    # Import models to ensure they are registered with Base
+    # This must be done before create_all
+    import app.models.database  # noqa: F401
+
+    # Create tables if they don't exist
+    async with _engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     
-    print("✅ PostgreSQL connection initialized")
+    print("✅ PostgreSQL connection initialized and tables created")
 
 
 async def close_postgres() -> None:
