@@ -38,9 +38,6 @@ export default function LandingPage() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="btn-secondary text-sm">
-            Log In
-          </Link>
           <Link href="/onboarding" className="btn-primary text-sm">
             Get Started
           </Link>
