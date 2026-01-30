@@ -22,6 +22,7 @@ COPY --from=builder /app/.venv /app/.venv
 
 # Copy application code
 COPY app ./app
+COPY create_bot.py .
 
 # Set environment variables
 ENV PATH="/app/.venv/bin:$PATH"
