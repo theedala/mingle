@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const INTERESTS = [
-  "Gaming 🎮", "Music 🎵", "Movies 🎬", "Sports ⚽", "Travel ✈️",
-  "Food 🍕", "Art 🎨", "Tech 💻", "Books 📚", "Photography 📷"
+  "Gaming", "Music", "Movies", "Sports", "Travel",
+  "Food", "Art", "Tech", "Books", "Photography"
 ];
 
 export default function LandingPage() {
@@ -116,19 +116,19 @@ export default function LandingPage() {
             number={1}
             title="Share Your Interests"
             description="Pick topics you love, choose your vibe, and set your comfort level. No photos required."
-            icon="🎯"
+            icon="target"
           />
           <StepCard
             number={2}
             title="Get Matched"
             description="Our algorithm finds people who share your passions and conversation style."
-            icon="🔗"
+            icon="link"
           />
           <StepCard
             number={3}
             title="Chat & Connect"
             description="Break the ice with games, chat anonymously, and reveal yourself when you're ready."
-            icon="💬"
+            icon="chat"
           />
         </div>
       </section>
@@ -142,10 +142,10 @@ export default function LandingPage() {
               <span className="text-cyan-400">always.</span>
             </h2>
             <ul className="space-y-4">
-              <FeatureItem icon="🔒" text="Anonymous profiles—share only what you want" />
-              <FeatureItem icon="🎭" text="Camera blur until you're comfortable" />
-              <FeatureItem icon="⏱️" text="Ephemeral messages that disappear" />
-              <FeatureItem icon="🛡️" text="AI moderation blocks toxic behavior" />
+              <FeatureItem icon="lock" text="Anonymous profiles—share only what you want" />
+              <FeatureItem icon="mask" text="Camera blur until you're comfortable" />
+              <FeatureItem icon="clock" text="Ephemeral messages that disappear" />
+              <FeatureItem icon="shield" text="AI moderation blocks toxic behavior" />
             </ul>
           </div>
           <div className="glass rounded-2xl p-8 animate-float">
@@ -240,6 +240,56 @@ function PreviewCard({
   );
 }
 
+// Icon component for SVG icons
+function Icon({ name, className = "w-8 h-8" }: { name: string; className?: string }) {
+  const icons: Record<string, React.ReactNode> = {
+    target: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" strokeWidth="2" />
+        <circle cx="12" cy="12" r="6" strokeWidth="2" />
+        <circle cx="12" cy="12" r="2" fill="currentColor" />
+      </svg>
+    ),
+    link: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+      </svg>
+    ),
+    chat: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+    lock: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </svg>
+    ),
+    mask: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+        <path d="M9 9h.01M15 9h.01M8 13s1.5 2 4 2 4-2 4-2" />
+      </svg>
+    ),
+    clock: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+    shield: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
+    ),
+  };
+  
+  return icons[name] || null;
+}
+
 function StepCard({ 
   number, 
   title, 
@@ -253,8 +303,8 @@ function StepCard({
 }) {
   return (
     <div className="card text-center group hover:border-purple-500/50 transition-all duration-300">
-      <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center text-3xl mx-auto mb-4 group-hover:scale-110 transition">
-        {icon}
+      <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition text-purple-400">
+        <Icon name={icon} />
       </div>
       <div className="text-sm text-purple-400 font-mono mb-2">STEP {number}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
@@ -266,7 +316,9 @@ function StepCard({
 function FeatureItem({ icon, text }: { icon: string; text: string }) {
   return (
     <li className="flex items-center gap-3">
-      <span className="text-xl">{icon}</span>
+      <span className="text-purple-400">
+        <Icon name={icon} className="w-6 h-6" />
+      </span>
       <span className="text-gray-300">{text}</span>
     </li>
   );
