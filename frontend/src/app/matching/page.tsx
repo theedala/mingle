@@ -27,6 +27,43 @@ export default function MatchingPage() {
     setUser({ anonymousId: stored.anonymousId });
   }, [router]);
 
+  // Define findMatch outside to be reusable
+  const findMatch = async (currentUserId: string) => {
+    try {
+      const result = await api.findMatch(currentUserId);
+
+      if (result.data?.status === "match_found" && result.data.match_id && result.data.partner) {
+        const match = {
+          matchId: result.data.match_id,
+          name: result.data.partner.display_name,
+          compatibility: result.data.partner.compatibility,
+          interests: result.data.partner.interests,
+          style: "Playful", // Would come from API
+        };
+
+        setMatchData(match);
+        setStatus("found");
+
+        // Save to local store
+        matchesStore.addMatch({
+          matchId: match.matchId,
+          partnerName: match.name,
+          partnerInterests: match.interests,
+          compatibility: match.compatibility,
+          unreadCount: 0,
+          createdAt: new Date().toISOString(),
+        });
+      } else {
+        // Still searching/queued - retry after delay
+        setTimeout(() => findMatch(currentUserId), 3000);
+      }
+    } catch (error) {
+      console.error("Error finding match:", error);
+      // Retry on error too
+      setTimeout(() => findMatch(currentUserId), 3000);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
 
@@ -35,48 +72,13 @@ export default function MatchingPage() {
       setSearchTime((prev) => prev + 1);
     }, 1000);
 
-    // Call API to find match
-    const findMatch = async () => {
-      try {
-        const result = await api.findMatch(user.anonymousId);
-
-        if (result.data?.status === "match_found" && result.data.match_id && result.data.partner) {
-          const match = {
-            matchId: result.data.match_id,
-            name: result.data.partner.display_name,
-            compatibility: result.data.partner.compatibility,
-            interests: result.data.partner.interests,
-            style: "Playful", // Would come from API
-          };
-
-          setMatchData(match);
-          setStatus("found");
-
-          // Save to local store
-          matchesStore.addMatch({
-            matchId: match.matchId,
-            partnerName: match.name,
-            partnerInterests: match.interests,
-            compatibility: match.compatibility,
-            unreadCount: 0,
-            createdAt: new Date().toISOString(),
-          });
-        } else {
-          // Still searching/queued - retry after delay
-          setTimeout(findMatch, 3000);
-        }
-      } catch (error) {
-        console.error("Error finding match:", error);
-        // Retry on error too
-        setTimeout(findMatch, 3000);
-      }
-    };
-
-    findMatch();
+    // Initial search
+    findMatch(user.anonymousId);
 
     return () => {
       clearInterval(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleAccept = () => {
@@ -89,32 +91,16 @@ export default function MatchingPage() {
   };
 
   const handleSkip = () => {
+    if (!user) return;
+    
     setStatus("searching");
     setMatchData(null);
     setSearchTime(0);
 
-    // Find another match
+    // Give a short delay before restarting search to reset UI
     setTimeout(() => {
-      const newMatch = {
-        matchId: `match_${Date.now()}`,
-        name: "ChillVibesOnly",
-        compatibility: 87,
-        interests: ["Music", "Travel", "Coffee"],
-        style: "Chill",
-      };
-
-      setMatchData(newMatch);
-      setStatus("found");
-
-      matchesStore.addMatch({
-        matchId: newMatch.matchId,
-        partnerName: newMatch.name,
-        partnerInterests: newMatch.interests,
-        compatibility: newMatch.compatibility,
-        unreadCount: 0,
-        createdAt: new Date().toISOString(),
-      });
-    }, 2000);
+      findMatch(user.anonymousId);
+    }, 500);
   };
 
   return (
